@@ -1,0 +1,108 @@
+@charset "utf-8";
+
+html, body{
+  height: 100%;
+}
+.div-flex{
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+.div-flex .flex-bd{
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+/* padding和border包含在宽高中 */
+.b-box{
+  box-sizing: border-box;
+}
+
+.home-search{
+  width: 60%;
+  margin: 0 auto;
+  margin-top: 12%;
+  padding-bottom: 10px;
+}
+.logo{
+  display: block;
+  margin: 50px auto;
+  text-align: center;
+  font-size: 22px;
+}
+.search-key, .siteNo{
+  line-height: 40px;
+  padding: 0 15px;
+  border: solid 1px #c5c5c5;
+  border-right: none;
+}
+.search-key:focus{
+  border-color: #3385ff;
+}
+.search-btn{
+  width: 100px;
+  line-height: 40px;
+  text-align: center;
+  background: #3385ff;
+  font-size: 16px;
+  color: #fff;
+}
+.search-btn:hover{
+  cursor: pointer;
+  box-shadow: #c5c5c5 1px 1px 5px;
+}
+
+#search-list{
+  height: 100%;
+  padding: 20px;
+}
+.list-title{
+  text-indent: 20px;
+  line-height: 35px;
+  font-size: 16px;
+  border: solid 1px #dcdee2;
+  border-width: 0 1px;
+  background: #369;
+  color: #fff;
+}
+.ivu-form-item{
+  display: inline-block;
+  margin-bottom: 20px;
+}
+/* .ivu-input{
+  width: 180px;
+} */
+.img-wrap{
+  padding-left: 15px;
+}
+.selectImg{
+  cursor: pointer;
+}
+.ivu-btn-info{
+  background-color: #3385ff;
+  border-color: #3385ff;
+}
+.ivu-modal-close .ivu-icon-ios-close{
+  top: 0;
+  color: #fff;
+  font-weight: bold;
+  background: #3385ff;
+  border-radius: 50%;
+}
+.plate{
+  font-size: 16px;
+
+}
+.noPic{
+  text-align: center;
+  line-height: 200px;
+}
+.index-tip{
+  color: #999;
+  margin: 10px 120px;
+  font-size: 14px;
+}

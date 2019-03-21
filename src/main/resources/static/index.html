@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>首页</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/common.css">
+</head>
+
+<body>
+  <div class="home-search">
+    <p class="logo">吐峪沟一次性停车车牌查询系统</p>
+    <div class="div-flex">
+      <select class="siteNo">
+        <option value="0244">吐峪沟主线</option>
+        <option value="0245">吐峪沟匝道</option>
+      </select>
+      <input type="text" class="search-key flex-bd b-box" placeholder="请输入车牌号" />
+      <a href="javascript:;" class="search-btn b-box">搜&#12288;索</a>
+    </div>
+    <p class="index-tip">可进行模糊查询</p>
+  </div>
+  <script src="js/jquery.min.js"></script>
+  <script>
+    $(function () {
+      $(".search-key").val("");
+      $(".search-btn").click(function(){
+        if(!$(".search-key").val()){
+          $(".search-key").focus();
+          return
+        }else{
+          window.localStorage.setItem('search-key', $('.search-key').val());
+          window.localStorage.setItem('siteNo', $('.siteNo').val());
+          window.location.href = './page/search-list.html';
+        }
+      })
+    })
+  </script>
+</body>

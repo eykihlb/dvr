@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>图片列表</title>
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/iview.css">
+  <link rel="stylesheet" href="../css/common.css">
+</head>
+
+<body>
+  <div id="search-list">
+    <div class="list-search-wrap">
+      <i-form :model="formItem" :label-width="80">
+        <Form-item label="车牌号码：">
+          <i-input v-model="formItem.plateNo" placeholder="请输入"></i-input>
+        </Form-item>
+        <Form-item label="开始时间：">
+          <Date-picker type="datetimerange" v-model="formItem.selectDate" style="width: 300px" placeholder="选择日期和时间"></Date-picker>
+        </Form-item>
+        <i-button type="info" @click="getList">查询</i-button>
+      </i-form>
+    </div>
+    <Row>
+      <i-col span="8">
+        <p class="list-title">车道过车记录</p>
+        <i-table :height="tableHeight" border stripe :columns="column" :data="tableData2.tableList"
+        @on-row-click="rowClick2"></i-table>
+        <Page 
+          :total="tableData2.totalCount" :current="tableData2.pageIndex" :page-size="tableData2.pageSize" show-sizer size="small"
+          style="margin: 10px 0;text-align: right" @on-change="changePage2"
+          @on-page-size-change="changeSize2"
+        ></Page>
+      </i-col>
+      <i-col span="8">
+        <p class="list-title">卡口过车记录</p>
+        <i-table :height="tableHeight" border stripe :columns="column" :data="tableData.tableList"
+                 @on-row-click="rowClick"></i-table>
+        <Page
+                :total="tableData.totalCount" :current="tableData.pageIndex" :page-size="tableData.pageSize" show-sizer size="small"
+                style="margin: 10px 0;text-align: right" @on-change="changePage"
+                @on-page-size-change="changeSize"
+        ></Page>
+      </i-col>
+      <i-col span="8" class="img-wrap">
+        <div>
+          <p class="list-title">车道图片</p>
+          <img :src="selectImgPath2" alt="" class="selectImg" @click="showImg2" :onerror="selectImgPath2 = ''" v-show="selectImgPath2">
+          <p class="noPic" v-show="!selectImgPath2">暂无图片</p>
+        </div>
+        <div>
+          <p class="list-title">卡口图片</p>
+          <img :src="selectImgPath" alt="" class="selectImg" @click="showImg" :onerror="selectImgPath = ''" v-show="selectImgPath">
+          <p class="noPic" v-show="!selectImgPath2">暂无图片</p>
+        </div>
+      </i-col>
+    </Row>
+    <Modal v-model="isLargeImg" footer-hide width="80%" :styles="{top: '30px'}">
+      <img :src="selectImgPath" alt="">
+    </Modal>
+    <Modal v-model="isLargeImg2" footer-hide width="80%" :styles="{top: '30px'}">
+      <img :src="selectImgPath2" alt="">
+    </Modal>
+  </div>
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/vue.js"></script>
+  <script src="../js/iview.js"></script>
+  <script src="../js/common.js"></script>
+  <script>
+    $(function () {
+      new Vue({
+        el: '#search-list',
+        data: {
+          isLargeImg: false,//卡口放大图片弹窗
+          selectImgPath: '',
+          isLargeImg2: false,//车道放大图片弹窗
+          selectImgPath2: '',
+          tableHeight: document.body.clientHeight - 170,
+          tableData: {//右侧表格数据
+            tableList: [],
+            tableList2: [],//左侧表格数据
+            totalCount: 0,//总条数
+            currPage: 1,//当前页 
+            pageSize: 10,//每页条数
+          },
+          tableData2: {//左侧表格数据
+              tableList: [],
+              totalCount: 0,//总条数
+              currPage: 1,//当前页
+              pageSize: 10,//每页条数
+          },
+          formItem: {
+            plateNo: window.localStorage.getItem('search-key'),
+            netSiteNo: window.localStorage.getItem('siteNo'),
+            start: '',
+            end: '',
+            pageIndex: '',
+            pageSize: '',
+            selectDate: ''
+          },
+          column: [
+            {
+              title: '收费站',
+              key: 'siteDesc',
+              align: 'center'
+            },{
+              title: '摄像机名称',
+              key: 'dvrName',
+              align: 'center'
+            },{
+              title: '抓拍时间',
+              key: 'createTime',
+              align: 'center'
+            },{
+              title: '车牌颜色',
+              key: 'plateColorCode',
+              width: '90',
+              align: 'center'
+            },{
+              title: '车牌号',
+              key: 'plateNo',
+              className: 'plate',
+              align: 'center'
+            }
+          ]
+        },
+        methods: {
+          showImg() {
+            this.isLargeImg = true;
+          },
+          showImg2() {
+            this.isLargeImg2 = true;
+          },
+          changePage (page) {
+            this.tableData.currPage = page;
+            this.getList();
+          },
+          changeSize (pageSize) {
+            this.tableData.pageSize = pageSize;
+            this.getList();
+          },
+          changePage2 (page) {
+              this.tableData2.currPage = page;
+              this.getList2();
+          },
+          changeSize2 (pageSize) {
+              this.tableData2.pageSize = pageSize;
+              this.getList2();
+          },
+          getList() {
+              var _self = this;
+              var dateArr = _self.formItem.selectDate;
+              if(dateArr[0]){
+                _self.formItem.start = dateFormat(dateArr[0], 'yyyy-mm-dd HH:MM:ss');
+                _self.formItem.end = dateFormat(dateArr[1], 'yyyy-mm-dd HH:MM:ss');
+              }else{
+                _self.formItem.start = '';
+                _self.formItem.end = '';
+              }
+              _self.formItem.pageIndex = _self.tableData.currPage;
+              _self.formItem.pageSize = _self.tableData.pageSize;
+            $.ajax({
+              url: window.localStorage.getItem('localUrl') +'/snap/list',
+              type: 'post',
+              async: false,
+              contentType: 'application/json;charset=UTF-8',
+              data: JSON.stringify(this.formItem),
+              success: function(res){
+                var requireData = JSON.parse(res);
+                if(requireData.status == '1'){
+                    _self.tableData.tableList = requireData.list;
+                    _self.selectImgPath = requireData.list[0].picId;
+                    _self.tableData.totalCount = Number(requireData.count);
+                }else{
+                    _self.$Message.warning(res.msg);
+                }
+              }
+            })
+          },
+          getList2() {
+              var _self = this;
+              var dateArr = _self.formItem.selectDate;
+              if(dateArr[0]){
+                  _self.formItem.start = dateFormat(dateArr[0], 'yyyy-mm-dd HH:MM:ss');
+                  _self.formItem.end = dateFormat(dateArr[1], 'yyyy-mm-dd HH:MM:ss');
+              }else{
+                  _self.formItem.start = '';
+                  _self.formItem.end = '';
+              }
+              _self.formItem.pageIndex = _self.tableData.currPage;
+              _self.formItem.pageSize = _self.tableData.pageSize;
+              $.ajax({
+                  url: window.localStorage.getItem('localUrl') +'/snap/list2',
+                  type: 'post',
+                  async: false,
+                  contentType: 'application/json;charset=UTF-8',
+                  data: JSON.stringify(this.formItem),
+                  success: function(res){
+                      var requireData = JSON.parse(res);
+                      if(requireData.status == '1'){
+                          _self.tableData2.tableList = requireData.list;
+                          _self.selectImgPath2 = requireData.list[0].picId;
+                          _self.tableData2.totalCount = Number(requireData.count);
+                      }else{
+                          _self.$Message.warning(res.msg);
+                      }
+                  }
+              })
+          },
+          rowClick(data, index) {
+            this.selectImgPath = data.picId;
+          }
+          ,
+          rowClick2(data, index) {
+            this.selectImgPath2 = data.picId;
+          }
+        },
+        mounted: function(){
+          this.getList();
+          this.getList2();
+        }
+      })
+    })
+  </script>
+</body>

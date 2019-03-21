@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mydao.dvr.dao.DataSnapLaneMapper" >
+  <resultMap id="BaseResultMap" type="com.mydao.dvr.entrty.DataSnapLane" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="CAMERA_IP" property="cameraIp" jdbcType="VARCHAR" />
+    <result column="PIC_URL" property="picUrl" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="VARCHAR" />
+    <result column="PLATE_NO" property="plateNo" jdbcType="VARCHAR" />
+    <result column="NET_SITE_NO" property="netSiteNo" jdbcType="VARCHAR" />
+    <result column="CAR_ID" property="carId" jdbcType="VARCHAR" />
+    <result column="PLATE_COLOR_CODE" property="plateColorCode" jdbcType="VARCHAR" />
+    <result column="STATE" property="state" jdbcType="VARCHAR" />
+    <result column="dvrName" property="dvrName" />
+    <result column="dvrDesc" property="dvrDesc" />
+    <result column="fileName" property="fileName" />
+    <result column="filePath" property="filePath"/>
+    <result column="fileSize" property="fileSize" />
+    <result column="extensionName" property="extensionName" />
+    <result column="netSiteNo" property="netSiteNo" />
+    <result column="siteDesc" property="siteDesc" />
+    <result column="sitetype" property="sitetype"/>
+    <result column="fullNetNo" property="fullNetNo"/>
+    <result column="pageIndex" property="pageIndex"/>
+    <result column="pageSize" property="pageSize"/>
+    <result column="start" property="start"/>
+    <result column="end" property="end"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, CAMERA_IP, PIC_URL,NET_SITE_NO, CREATE_TIME, PLATE_NO, PLATE_COLOR_CODE, STATE,CAR_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from DATA_SNAP
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <select id="findList" parameterType="com.mydao.dvr.entrty.DataSnapLane" resultMap="BaseResultMap">
+    select * from (
+      select
+      t1.*,
+      t3.DVR_NAME dvrName,t3.DVR_DESC dvrDesc,t5.NET_SITE_NO netSiteNo,t5.SITE_DESC siteDesc,t5.SITETYPE sitetype,t5.FULL_NET_NO fullNetNo,
+      rownum as rn
+      from
+    DATA_SNAP_LANE t1,CODE_VIDEO_CAMERA t3,SITEINFO t5
+      where  t1.CAMERA_IP = t3.dvr_ip(+)
+    and t1.NET_SITE_NO = t5.NET_SITE_NO(+)
+    and t1.net_site_no = #{netSiteNo}
+      <if test="plateNo != null and plateNo != ''" >
+        and t1.PLATE_NO like '%'||#{plateNo}||'%'
+      </if>
+      <if test="start != null" >
+        and t1.CREATE_TIME  &gt;= #{start}
+      </if>
+      <if test="end != null" >
+        and t1.CREATE_TIME &lt;= #{end}
+      </if>
+    ORDER by t1.CREATE_TIME desc
+    ) x where x.rn &gt;= #{beginRow} and x.rn &lt; #{endRow}
+  </select>
+
+  <select id="count" parameterType="com.mydao.dvr.entrty.DataSnapLane" resultType="java.lang.Integer" >
+    select
+     count(1)
+    from
+    DATA_SNAP_LANE t1,CODE_VIDEO_CAMERA t3,SITEINFO t5
+    where t1.CAMERA_IP = t3.dvr_ip(+)
+    and t1.NET_SITE_NO = t5.NET_SITE_NO(+)
+    and t1.net_site_no = #{netSiteNo}
+    <if test="plateNo != null and plateNo != ''" >
+      and t1.PLATE_NO like '%'||#{plateNo}||'%'
+    </if>
+    <if test="start != '' and start != null" >
+      and t1.CREATE_TIME  &gt;= #{start}
+    </if>
+    <if test="end != '' and end != null" >
+      and t1.CREATE_TIME &lt;= #{end}
+    </if>
+  </select>
+</mapper>
