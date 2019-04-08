@@ -27,6 +27,24 @@ public class DataSnap extends BaseEntity{
     private String fullNetNo;
     private String start;
     private String end;
+    private String startSite;
+    private String endSite;
+
+    public String getStartSite() {
+        return startSite;
+    }
+
+    public void setStartSite(String startSite) {
+        this.startSite = startSite;
+    }
+
+    public String getEndSite() {
+        return endSite;
+    }
+
+    public void setEndSite(String endSite) {
+        this.endSite = endSite;
+    }
 
     public String getCarId() {
         return carId;

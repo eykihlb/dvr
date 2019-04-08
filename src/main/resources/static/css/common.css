@@ -34,11 +34,26 @@ html, body{
   text-align: center;
   font-size: 22px;
 }
-.search-key, .siteNo{
+.keyWrap{
+  line-height: 40px;
+}
+.search-key, .keyWrap .ivu-select-selection{
   line-height: 40px;
   padding: 0 15px;
   border: solid 1px #c5c5c5;
   border-right: none;
+}
+.keyWrap .ivu-select{
+  width: 115px;
+}
+.keyWrap .ivu-select-selection{
+  border-color: #c5c5c5;
+  height: 42px;
+  border-radius: 0;
+}
+.keyWrap .ivu-select-input{
+  height: 42px;
+  line-height: 42px;
 }
 .search-key:focus{
   border-color: #3385ff;
@@ -58,24 +73,25 @@ html, body{
 
 #search-list{
   height: 100%;
-  padding: 20px;
+  padding: 10px 20px;
 }
 .list-title{
   text-indent: 20px;
-  line-height: 35px;
+  line-height: 28px;
   font-size: 16px;
   border: solid 1px #dcdee2;
   border-width: 0 1px;
   background: #369;
   color: #fff;
 }
+.list-title>span{
+  margin-left: 15px;
+  font-size: 12px;
+}
 .ivu-form-item{
   display: inline-block;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
-/* .ivu-input{
-  width: 180px;
-} */
 .img-wrap{
   padding-left: 15px;
 }
@@ -99,10 +115,56 @@ html, body{
 }
 .noPic{
   text-align: center;
-  line-height: 200px;
+  /* line-height: 200px; */
 }
 .index-tip{
   color: #999;
-  margin: 10px 120px;
+  margin: 10px 270px;
   font-size: 14px;
+}
+
+/* 摄像机列表 */
+.fr{
+  float: right;
+}
+.tc{
+  text-align: center;
+}
+.ivu-btn-ghost {
+  color: #657180;
+}
+.list-search-wrap span{
+  padding-left: 10px;
+  font-weight: bold;
+}
+.search-btn{
+  width: 100px;
+  line-height: 40px;
+  text-align: center;
+  background: #3385ff;
+  font-size: 16px;
+  color: #fff;
+}
+.search-btn:hover{
+  cursor: pointer;
+  box-shadow: #c5c5c5 1px 1px 5px;
+}
+
+.ivu-form{
+  padding: 0 50px;
+}
+.dvrAddDiv .ivu-form-item{
+  margin-bottom: 20px;
+}
+.comBtn{
+  display: inline-block;
+  padding: 6px;
+  border:solid 1px #2d78f4;
+  background: #3385ff;
+  color: #fff;
+  cursor: pointer;
+}
+.banBtn{
+  border:solid 1px #f54545;
+  background: #ff8547;
 }

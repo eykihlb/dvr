@@ -15,16 +15,51 @@ public class CodeVideoCamera {
 
     private String sPassWord;
 
-    private String byRes;
+    private String direction;
 
     private String state;
 
-    public String getState() {
-        return state;
+    private String dvrID;
+
+    private Integer beginRow;
+
+    private Integer endRow;
+
+    private Integer pageIndex;
+
+    private Integer pageSize;
+
+
+    public Integer getBeginRow() {
+        return beginRow;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setBeginRow(Integer beginRow) {
+        this.beginRow = beginRow;
+    }
+
+    public Integer getEndRow() {
+        return endRow;
+    }
+
+    public void setEndRow(Integer endRow) {
+        this.endRow = endRow;
+    }
+
+    public Integer getPageIndex() {
+        return pageIndex;
+    }
+
+    public void setPageIndex(Integer pageIndex) {
+        this.pageIndex = pageIndex;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 
     public String getId() {
@@ -83,11 +118,27 @@ public class CodeVideoCamera {
         this.sPassWord = sPassWord == null ? null : sPassWord.trim();
     }
 
-    public String getByRes() {
-        return byRes;
+    public String getDirection() {
+        return direction;
     }
 
-    public void setByRes(String byRes) {
-        this.byRes = byRes == null ? null : byRes.trim();
+    public void setDirection(String direction) {
+        this.direction = direction == null ? null : direction.trim();
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state == null ? null : state.trim();
+    }
+
+    public String getDvrID() {
+        return dvrID;
+    }
+
+    public void setDvrID(String dvrID) {
+        this.dvrID = dvrID == null ? null : dvrID.trim();
     }
 }

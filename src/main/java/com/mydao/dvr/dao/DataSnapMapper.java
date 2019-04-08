@@ -15,4 +15,5 @@ public interface DataSnapMapper {
     DataSnap selectByPrimaryKey(String id);
     List<DataSnap> findList(DataSnap dataSnap);
     Integer count(DataSnap dataSnap);
+    Integer deleteTimeoutData();
 }

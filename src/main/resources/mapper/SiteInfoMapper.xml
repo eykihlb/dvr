@@ -96,4 +96,8 @@
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
+
+  <select id="findList" resultMap="BaseResultMap">
+    select * from siteinfo
+  </select>
 </mapper>

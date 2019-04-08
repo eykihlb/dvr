@@ -21,6 +21,7 @@
     <result column="siteDesc" property="siteDesc" />
     <result column="sitetype" property="sitetype"/>
     <result column="fullNetNo" property="fullNetNo"/>
+    <result column="dvrID" property="dvrID"/>
     <result column="pageIndex" property="pageIndex"/>
     <result column="pageSize" property="pageSize"/>
     <result column="start" property="start"/>
@@ -36,6 +37,9 @@
     where ID = #{id,jdbcType=VARCHAR}
   </select>
 
+  <update id="updateByPrimaryKeySelective" parameterType="com.mydao.dvr.entrty.DataSnapLane">
+    update data_snap_lane set state = #{state} where id = #{id}
+  </update>
   <select id="findList" parameterType="com.mydao.dvr.entrty.DataSnapLane" resultMap="BaseResultMap">
     select * from (
       select
@@ -78,4 +82,17 @@
       and t1.CREATE_TIME &lt;= #{end}
     </if>
   </select>
+
+  <select id="selectByPlateNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select t1.*,t3.dvr_id dvrID
+    from data_snap_lane t1,Code_video_camera t3
+    where t1.camera_ip = t3.dvr_ip
+    and t1.create_time = (
+    select max(t2.create_time) from data_snap_lane t2 where t2.plate_no = #{plateNo} and t2.state = '0'
+    )
+  </select>
+
+  <delete id="deleteTimeoutData">
+    delete from data_snap_lane where create_time &lt; to_char((sysdate-1),'yyyy-MM-dd HH24:Mi:ss')
+  </delete>
 </mapper>

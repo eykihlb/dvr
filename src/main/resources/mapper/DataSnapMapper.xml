@@ -13,18 +13,12 @@
     <result column="STATE" property="state" jdbcType="VARCHAR" />
     <result column="dvrName" property="dvrName" />
     <result column="dvrDesc" property="dvrDesc" />
-    <result column="fileName" property="fileName" />
-    <result column="filePath" property="filePath"/>
-    <result column="fileSize" property="fileSize" />
-    <result column="extensionName" property="extensionName" />
-    <result column="netSiteNo" property="netSiteNo" />
-    <result column="siteDesc" property="siteDesc" />
-    <result column="sitetype" property="sitetype"/>
-    <result column="fullNetNo" property="fullNetNo"/>
     <result column="pageIndex" property="pageIndex"/>
     <result column="pageSize" property="pageSize"/>
     <result column="start" property="start"/>
     <result column="end" property="end"/>
+    <result column="startSite" property="startSite"/>
+    <result column="endSite" property="endSite"/>
   </resultMap>
   <sql id="Base_Column_List" >
     ID, CAMERA_IP, PIC_URL, CREATE_TIME, PLATE_NO, PLATE_COLOR_CODE, STATE,CAR_ID
@@ -40,23 +34,28 @@
     select * from (
       select
       t1.*,
-      t3.DVR_NAME dvrName,t3.DVR_DESC dvrDesc,t5.NET_SITE_NO netSiteNo,t5.SITE_DESC siteDesc,t5.SITETYPE sitetype,t5.FULL_NET_NO fullNetNo,
+      t3.DVR_NAME dvrName,t3.dvr_id dvrDesc,
       rownum as rn
       from
-      DATA_SNAP t1,CODE_VIDEO_CAMERA t3,SITEINFO t5
-      where t1.CAMERA_IP = t3.dvr_ip(+)
-    and t1.NET_SITE_NO = t5.NET_SITE_NO(+)
-    and t1.net_site_no = #{netSiteNo}
-      <if test="plateNo != null and plateNo != ''" >
-        and t1.PLATE_NO like '%'||#{plateNo}||'%'
-      </if>
-      <if test="start != null" >
-        and t1.CREATE_TIME  &gt;= #{start}
-      </if>
-      <if test="end != null" >
-        and t1.CREATE_TIME &lt;= #{end}
-      </if>
-    ORDER by t1.CREATE_TIME desc
+      DATA_SNAP t1,CODE_VIDEO_CAMERA t3
+      where t1.road_name||t1.road_to = t3.dvr_id(+)
+        <if test="1 == netSiteNo">
+          and (t1.road_name = #{startSite}||#{endSite} or t1.net_site_no = #{endSite}||#{startSite})
+        </if>
+        <if test="netSiteNo != 1">
+          and t1.road_name = #{netSiteNo}
+        </if>
+        and t1.create_time > to_char((sysdate - 1),'yyyy-MM-dd HH24:Mi:ss')
+        <if test="plateNo != null and plateNo != ''" >
+          and t1.PLATE_NO like '%'||#{plateNo}||'%'
+        </if>
+        <if test="start != null" >
+          and t1.CREATE_TIME  &gt;= #{start}
+        </if>
+        <if test="end != null" >
+          and t1.CREATE_TIME &lt;= #{end}
+        </if>
+        ORDER by t1.CREATE_TIME desc
     ) x where x.rn &gt;= #{beginRow} and x.rn &lt; #{endRow}
   </select>
 
@@ -64,10 +63,15 @@
     select
      count(1)
     from
-    DATA_SNAP t1,CODE_VIDEO_CAMERA t3,SITEINFO t5
-    where t1.CAMERA_IP = t3.dvr_ip(+)
-    and t1.NET_SITE_NO = t5.NET_SITE_NO(+)
-    and t1.net_site_no = #{netSiteNo}
+    DATA_SNAP t1,CODE_VIDEO_CAMERA t3
+    where t1.road_name||t1.road_to = t3.dvr_id(+)
+    <if test="1 == netSiteNo">
+      and (t1.road_name = #{startSite}||#{endSite} or t1.net_site_no = #{endSite}||#{startSite})
+    </if>
+    <if test="netSiteNo != 1">
+      and t1.road_name = #{netSiteNo}
+    </if>
+    and t1.create_time > to_char((sysdate - 1),'yyyy-MM-dd HH24:Mi:ss')
     <if test="plateNo != null and plateNo != ''" >
       and t1.PLATE_NO like '%'||#{plateNo}||'%'
     </if>
@@ -78,4 +82,9 @@
       and t1.CREATE_TIME &lt;= #{end}
     </if>
   </select>
+
+  <delete id="deleteTimeoutData">
+    delete from data_snap where create_time &lt; to_char((sysdate-1),'yyyy-MM-dd HH24:Mi:ss')
+  </delete>
+
 </mapper>

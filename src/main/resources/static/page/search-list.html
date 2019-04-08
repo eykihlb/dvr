@@ -20,48 +20,62 @@
         <Form-item label="开始时间：">
           <Date-picker type="datetimerange" v-model="formItem.selectDate" style="width: 300px" placeholder="选择日期和时间"></Date-picker>
         </Form-item>
-        <i-button type="info" @click="getList">查询</i-button>
+        <i-button type="info" @click="allList">查询</i-button>
       </i-form>
     </div>
     <Row>
-      <i-col span="8">
-        <p class="list-title">车道过车记录</p>
-        <i-table :height="tableHeight" border stripe :columns="column" :data="tableData2.tableList"
-        @on-row-click="rowClick2"></i-table>
+      <i-col span="16">
+        <p class="list-title">车道过车记录<span>{{ startSiteName }}</span></p>
+        <i-table :height="tableHeight" border stripe :columns="column" :data="tableData1.tableList"
+        @on-row-click="rowClick1"></i-table>
         <Page 
-          :total="tableData2.totalCount" :current="tableData2.pageIndex" :page-size="tableData2.pageSize" show-sizer size="small"
-          style="margin: 10px 0;text-align: right" @on-change="changePage2"
-          @on-page-size-change="changeSize2"
+          :total="tableData1.totalCount" :current="tableData1.pageIndex" :page-size="tableData1.pageSize" show-sizer size="small"
+          style="margin: 10px 0;text-align: right" @on-change="changePage1"
+          @on-page-size-change="changeSize1"
         ></Page>
-      </i-col>
-      <i-col span="8">
-        <p class="list-title">卡口过车记录</p>
-        <i-table :height="tableHeight" border stripe :columns="column" :data="tableData.tableList"
-                 @on-row-click="rowClick"></i-table>
+        <p class="list-title">匝道过车记录<span>{{ startSiteName }}</span></p>
+        <i-table :height="tableHeight" border stripe :columns="column2" :data="tableData2.tableList"
+                 @on-row-click="rowClick2"></i-table>
         <Page
-                :total="tableData.totalCount" :current="tableData.pageIndex" :page-size="tableData.pageSize" show-sizer size="small"
-                style="margin: 10px 0;text-align: right" @on-change="changePage"
-                @on-page-size-change="changeSize"
+                :total="tableData2.totalCount" :current="tableData2.pageIndex" :page-size="tableData2.pageSize" show-sizer size="small"
+                style="margin: 10px 0;text-align: right" @on-change="changePage2"
+                @on-page-size-change="changeSize2"
+        ></Page>
+        <p class="list-title">主线过车记录<span>{{ startSiteName }} <span style="font-size:20px">&harr;</span> {{ endSiteName}}</span></p>
+        <i-table :height="tableHeight" border stripe :columns="column2" :data="tableData3.tableList"
+                 @on-row-click="rowClick3"></i-table>
+        <Page
+                :total="tableData3.totalCount" :current="tableData3.pageIndex" :page-size="tableData3.pageSize" show-sizer size="small"
+                style="margin: 10px 0;text-align: right" @on-change="changePage3"
+                @on-page-size-change="changeSize3"
         ></Page>
       </i-col>
       <i-col span="8" class="img-wrap">
         <div>
           <p class="list-title">车道图片</p>
-          <img :src="selectImgPath2" alt="" class="selectImg" @click="showImg2" :onerror="selectImgPath2 = ''" v-show="selectImgPath2">
-          <p class="noPic" v-show="!selectImgPath2">暂无图片</p>
+          <img :src="selectImgPath1" alt="" :height="tableHeight" class="selectImg" @click="showImg1" :onerror="selectImgPath1 = ''" v-show="selectImgPath1">
+          <p class="noPic" v-bind:style="{ lineHeight: (tableHeight + 46) + 'px' }" v-show="!selectImgPath1">暂无图片</p>
         </div>
         <div>
-          <p class="list-title">卡口图片</p>
-          <img :src="selectImgPath" alt="" class="selectImg" @click="showImg" :onerror="selectImgPath = ''" v-show="selectImgPath">
-          <p class="noPic" v-show="!selectImgPath2">暂无图片</p>
+          <p class="list-title">匝道图片</p>
+          <img :src="selectImgPath2" alt="" :height="tableHeight" class="selectImg" @click="showImg2" :onerror="selectImgPath2 = ''" v-show="selectImgPath2">
+          <p class="noPic" v-bind:style="{ lineHeight: (tableHeight + 46) + 'px' }" v-show="!selectImgPath2">暂无图片</p>
+        </div>
+        <div>
+          <p class="list-title">主线图片</p>
+          <img :src="selectImgPath3" alt="" :height="tableHeight" class="selectImg" @click="showImg3" :onerror="selectImgPath3 = ''" v-show="selectImgPath3">
+          <p class="noPic" v-bind:style="{ lineHeight: (tableHeight + 46) + 'px' }" v-show="!selectImgPath3">暂无图片</p>
         </div>
       </i-col>
     </Row>
-    <Modal v-model="isLargeImg" footer-hide width="80%" :styles="{top: '30px'}">
-      <img :src="selectImgPath" alt="">
+    <Modal v-model="isLargeImg1" footer-hide width="80%" :styles="{top: '30px'}">
+      <img :src="selectImgPath1" alt="">
     </Modal>
     <Modal v-model="isLargeImg2" footer-hide width="80%" :styles="{top: '30px'}">
       <img :src="selectImgPath2" alt="">
+    </Modal>
+    <Modal v-model="isLargeImg3" footer-hide width="80%" :styles="{top: '30px'}">
+      <img :src="selectImgPath3" alt="">
     </Modal>
   </div>
   <script src="../js/jquery.min.js"></script>
@@ -73,14 +87,17 @@
       new Vue({
         el: '#search-list',
         data: {
-          isLargeImg: false,//卡口放大图片弹窗
-          selectImgPath: '',
-          isLargeImg2: false,//车道放大图片弹窗
+          startSiteName: window.localStorage.getItem('startSiteName'),
+          endSiteName: window.localStorage.getItem('endSiteName'),
+          isLargeImg1: false,//车道放大图片弹窗
+          selectImgPath1: '',
+          isLargeImg2: false,//匝道放大图片弹窗
           selectImgPath2: '',
-          tableHeight: document.body.clientHeight - 170,
-          tableData: {//右侧表格数据
+          isLargeImg3: false,//主线放大图片弹窗
+          selectImgPath3: '',
+          tableHeight: (document.body.clientHeight - 75)/3 - 72,
+          tableData1: {//右侧表格数据
             tableList: [],
-            tableList2: [],//左侧表格数据
             totalCount: 0,//总条数
             currPage: 1,//当前页 
             pageSize: 10,//每页条数
@@ -91,9 +108,16 @@
               currPage: 1,//当前页
               pageSize: 10,//每页条数
           },
+          tableData3: {//左侧表格数据
+              tableList: [],
+              totalCount: 0,//总条数
+              currPage: 1,//当前页
+              pageSize: 10,//每页条数
+          },
           formItem: {
             plateNo: window.localStorage.getItem('search-key'),
-            netSiteNo: window.localStorage.getItem('siteNo'),
+            startSite: window.localStorage.getItem('startSite'),
+            endSite: window.localStorage.getItem('endSite'),
             start: '',
             end: '',
             pageIndex: '',
@@ -124,22 +148,57 @@
               className: 'plate',
               align: 'center'
             }
+          ],
+          column2: [
+            {
+              title: '摄像机ID',
+              key: 'dvrDesc',
+              align: 'center'
+            },{
+              title: '摄像机名称',
+              key: 'dvrName',
+              align: 'center'
+            },{
+              title: '抓拍时间',
+              key: 'createTime',
+              align: 'center'
+            },{
+              title: '车牌颜色',
+              key: 'plateColorCode',
+              width: '90',
+              align: 'center'
+            },{
+              title: '车牌号',
+              key: 'plateNo',
+              className: 'plate',
+              align: 'center'
+            }
           ]
         },
         methods: {
-          showImg() {
-            this.isLargeImg = true;
+          getTargetSiteName() {
+            if(window.localStorage.getItem('siteNo') == '0244'){
+              this.targetSiteName = '吐峪沟匝道方向';
+            }else if(window.localStorage.getItem('siteNo') == '0245'){
+              this.targetSiteName = '吐峪沟主线方向';
+            }
+          },
+          showImg1() {
+            this.isLargeImg1 = true;
           },
           showImg2() {
             this.isLargeImg2 = true;
           },
-          changePage (page) {
-            this.tableData.currPage = page;
-            this.getList();
+          showImg3() {
+            this.isLargeImg3 = true;
           },
-          changeSize (pageSize) {
-            this.tableData.pageSize = pageSize;
-            this.getList();
+          changePage1 (page) {
+            this.tableData1.currPage = page;
+            this.getList1();
+          },
+          changeSize1 (pageSize) {
+            this.tableData1.pageSize = pageSize;
+            this.getList1();
           },
           changePage2 (page) {
               this.tableData2.currPage = page;
@@ -149,7 +208,15 @@
               this.tableData2.pageSize = pageSize;
               this.getList2();
           },
-          getList() {
+          changePage3 (page) {
+              this.tableData3.currPage = page;
+              this.getList3();
+          },
+          changeSize3 (pageSize) {
+              this.tableData3.pageSize = pageSize;
+              this.getList3();
+          },
+          getList1() {
               var _self = this;
               var dateArr = _self.formItem.selectDate;
               if(dateArr[0]){
@@ -159,10 +226,10 @@
                 _self.formItem.start = '';
                 _self.formItem.end = '';
               }
-              _self.formItem.pageIndex = _self.tableData.currPage;
-              _self.formItem.pageSize = _self.tableData.pageSize;
+              _self.formItem.pageIndex = _self.tableData1.currPage;
+              _self.formItem.pageSize = _self.tableData1.pageSize;
             $.ajax({
-              url: window.localStorage.getItem('localUrl') +'/snap/list',
+              url: window.localStorage.getItem('localUrl') +'/snap/list1',
               type: 'post',
               async: false,
               contentType: 'application/json;charset=UTF-8',
@@ -170,9 +237,11 @@
               success: function(res){
                 var requireData = JSON.parse(res);
                 if(requireData.status == '1'){
-                    _self.tableData.tableList = requireData.list;
-                    _self.selectImgPath = requireData.list[0].picId;
-                    _self.tableData.totalCount = Number(requireData.count);
+                    _self.tableData1.tableList = requireData.list;
+                    if(requireData.list.length){
+                        _self.selectImgPath1 = requireData.list[0].picId;
+                    }
+                    _self.tableData1.totalCount = Number(requireData.count);
                 }else{
                     _self.$Message.warning(res.msg);
                 }
@@ -189,8 +258,8 @@
                   _self.formItem.start = '';
                   _self.formItem.end = '';
               }
-              _self.formItem.pageIndex = _self.tableData.currPage;
-              _self.formItem.pageSize = _self.tableData.pageSize;
+              _self.formItem.pageIndex = _self.tableData2.currPage;
+              _self.formItem.pageSize = _self.tableData2.pageSize;
               $.ajax({
                   url: window.localStorage.getItem('localUrl') +'/snap/list2',
                   type: 'post',
@@ -201,7 +270,9 @@
                       var requireData = JSON.parse(res);
                       if(requireData.status == '1'){
                           _self.tableData2.tableList = requireData.list;
-                          _self.selectImgPath2 = requireData.list[0].picId;
+                          if(requireData.list.length){
+                              _self.selectImgPath2 = requireData.list[0].picId;
+                          }
                           _self.tableData2.totalCount = Number(requireData.count);
                       }else{
                           _self.$Message.warning(res.msg);
@@ -209,17 +280,58 @@
                   }
               })
           },
-          rowClick(data, index) {
-            this.selectImgPath = data.picId;
-          }
-          ,
+          getList3() {
+              var _self = this;
+              var dateArr = _self.formItem.selectDate;
+              if(dateArr[0]){
+                  _self.formItem.start = dateFormat(dateArr[0], 'yyyy-mm-dd HH:MM:ss');
+                  _self.formItem.end = dateFormat(dateArr[1], 'yyyy-mm-dd HH:MM:ss');
+              }else{
+                  _self.formItem.start = '';
+                  _self.formItem.end = '';
+              }
+              _self.formItem.pageIndex = _self.tableData3.currPage;
+              _self.formItem.pageSize = _self.tableData3.pageSize;
+              $.ajax({
+                  url: window.localStorage.getItem('localUrl') +'/snap/list3',
+                  type: 'post',
+                  async: false,
+                  contentType: 'application/json;charset=UTF-8',
+                  data: JSON.stringify(this.formItem),
+                  success: function(res){
+                      var requireData = JSON.parse(res);
+                      if(requireData.status == '1'){
+                          _self.tableData3.tableList = requireData.list;
+                          if(requireData.list.length){
+                              _self.selectImgPath3 = requireData.list[0].picId;
+                          }
+                          _self.tableData3.totalCount = Number(requireData.count);
+                      }else{
+                          _self.$Message.warning(res.msg);
+                      }
+                  }
+              })
+          },
+          rowClick1(data, index) {
+            this.selectImgPath1 = data.picId;
+          },
           rowClick2(data, index) {
             this.selectImgPath2 = data.picId;
+          },
+          rowClick3(data, index) {
+            this.selectImgPath3 = data.picId;
+          },
+          allList() {
+            this.getList1();
+            this.getList2();
+            this.getList3();
           }
         },
         mounted: function(){
-          this.getList();
-          this.getList2();
+          //this.getTargetSiteName();
+          this.getList1();
+          /*this.getList2();
+          this.getList3();*/
         }
       })
     })

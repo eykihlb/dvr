@@ -6,34 +6,98 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>首页</title>
   <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/iview.css">
   <link rel="stylesheet" href="css/common.css">
 </head>
 
 <body>
   <div class="home-search">
     <p class="logo">吐峪沟一次性停车车牌查询系统</p>
-    <div class="div-flex">
-      <select class="siteNo">
-        <option value="0244">吐峪沟主线</option>
-        <option value="0245">吐峪沟匝道</option>
-      </select>
-      <input type="text" class="search-key flex-bd b-box" placeholder="请输入车牌号" />
-      <a href="javascript:;" class="search-btn b-box">搜&#12288;索</a>
+    <div class="div-flex keyWrap">
+      <i-select v-model="startSite" filterable label-in-value @on-change='getStartSite' placeholder='起'>
+        <i-option v-for='item in siteList' :value="item.netSiteNo" :key='item.netSiteNo'>{{ item.siteDesc }}</i-option>
+      </i-select>
+      <i-select v-model="endSite" filterable label-in-value @on-change='getEndSite' placeholder='止'>
+        <i-option v-for='item in siteList' :value="item.netSiteNo" :key='item.netSiteNo'>{{ item.siteDesc }}</i-option>
+      </i-select>
+      <Input v-model="searchKey" class="search-key flex-bd b-box" placeholder="请输入车牌号" />
+      <a href="javascript:;" class="search-btn b-box" @click='startSearch'>搜&#12288;索</a>
     </div>
     <p class="index-tip">可进行模糊查询</p>
   </div>
   <script src="js/jquery.min.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/iview.js"></script>
   <script>
     $(function () {
-      $(".search-key").val("");
-      $(".search-btn").click(function(){
-        if(!$(".search-key").val()){
-          $(".search-key").focus();
-          return
-        }else{
-          window.localStorage.setItem('search-key', $('.search-key').val());
-          window.localStorage.setItem('siteNo', $('.siteNo').val());
-          window.location.href = './page/search-list.html';
+      new Vue({
+        el: '.home-search',
+        data: {
+          startSite: '',//起始收费站编码
+          endSite: '',//结束收费站编码
+          startSiteName: '',//起始收费站名称
+          endSiteName: '',//结束收费站名称
+          searchKey: '',//查询关键字
+          siteList: [
+            {
+              id: '1',
+              netSiteNo: '0244',
+              siteDesc: '吐峪沟主线'
+            },
+            {
+              id: '2',
+              netSiteNo: '0245',
+              siteDesc: '吐峪沟匝道'
+            }
+          ]
+        },
+        methods: {
+          getSiteList () {
+            var _self = this;
+            $.ajax({
+              url: window.localStorage.getItem('localUrl') +'/snap/getSiteInfo',
+              type: 'get',
+              async: false,
+              contentType: 'application/json;charset=UTF-8',
+              //data: JSON.stringify(this.formItem),
+              success: function(res){
+                var requireData = JSON.parse(res);
+                if(requireData.status == '1'){
+                    _self.siteList = requireData.data;
+                }else{
+                    _self.$Message.warning(res.msg);
+                }
+              }
+            })
+          },
+          getStartSite(val) {
+            this.startSiteName = val.label;
+          },
+          getEndSite(val) {
+            this.endSiteName = val.label;
+          },
+          startSearch () {
+            if(this.startSite == this.endSite){
+              this.$Message.warning('起始收费站和结束收费站不可选择相同的收费站！')
+            }else if(!this.startSite || !this.endSite){
+              this.$Message.warning('收费站不能为空！')
+            }else{
+              if(!this.searchKey){
+                this.$Message.warning('请填写搜索关键字！');
+                $(".search-key").focus();
+              }else{
+                window.localStorage.setItem('search-key', this.searchKey);
+                window.localStorage.setItem('startSite', this.startSite);
+                window.localStorage.setItem('startSiteName', this.startSiteName);
+                window.localStorage.setItem('endSite', this.endSite);
+                window.localStorage.setItem('endSiteName', this.endSiteName);
+                window.location.href = './page/search-list.html';
+              }
+            }
+          }
+        },
+        mounted: function(){
+          this.getSiteList();
         }
       })
     })

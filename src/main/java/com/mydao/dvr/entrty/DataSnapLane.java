@@ -27,7 +27,14 @@ public class DataSnapLane extends BaseEntity{
     private String fullNetNo;
     private String start;
     private String end;
+    private String dvrID;
 
+    public String getDvrID(){
+        return dvrID;
+    }
+    public void setDvrID(String dvrID){
+        this.dvrID = dvrID;
+    }
     public String getCarId() {
         return carId;
     }

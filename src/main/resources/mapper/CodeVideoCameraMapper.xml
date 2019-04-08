@@ -9,11 +9,13 @@
     <result column="DVR_PORT" property="dvrPort" jdbcType="VARCHAR" />
     <result column="DW_SIZE" property="dwSize" jdbcType="VARCHAR" />
     <result column="S_PASS_WORD" property="sPassWord" jdbcType="VARCHAR" />
-    <result column="BY_RES" property="byRes" jdbcType="VARCHAR" />
+    <result column="DIRECTION" property="direction" jdbcType="VARCHAR" />
     <result column="STATE" property="state" jdbcType="VARCHAR" />
+    <result column="DVR_ID" property="dvrID" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    ID, DVR_NAME, DVR_DESC, DVR_IP, DVR_PORT, DW_SIZE, S_PASS_WORD, BY_RES, STATE
+    ID, DVR_NAME, DVR_DESC, DVR_IP, DVR_PORT, DW_SIZE, S_PASS_WORD, DIRECTION, STATE, 
+    DVR_ID
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -49,11 +51,14 @@
       <if test="sPassWord != null" >
         S_PASS_WORD,
       </if>
-      <if test="byRes != null" >
-        BY_RES,
+      <if test="direction != null" >
+        DIRECTION,
       </if>
       <if test="state != null" >
         STATE,
+      </if>
+      <if test="dvrID != null" >
+        DVR_ID,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -78,11 +83,14 @@
       <if test="sPassWord != null" >
         #{sPassWord,jdbcType=VARCHAR},
       </if>
-      <if test="byRes != null" >
-        #{byRes,jdbcType=VARCHAR},
+      <if test="direction != null" >
+        #{direction,jdbcType=VARCHAR},
       </if>
       <if test="state != null" >
         #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="dvrID != null" >
+        #{dvrID,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -107,13 +115,37 @@
       <if test="sPassWord != null" >
         S_PASS_WORD = #{sPassWord,jdbcType=VARCHAR},
       </if>
-      <if test="byRes != null" >
-        BY_RES = #{byRes,jdbcType=VARCHAR},
+      <if test="direction != null" >
+        DIRECTION = #{direction,jdbcType=VARCHAR},
       </if>
       <if test="state != null" >
         STATE = #{state,jdbcType=VARCHAR},
       </if>
+      <if test="dvrID != null" >
+        DVR_ID = #{dvrID,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
+
+  <select id="selectList" parameterType="com.mydao.dvr.entrty.CodeVideoCamera" resultMap="BaseResultMap">
+    select * from (
+      select t.*,rownum as rn from Code_video_camera t where 1 = 1
+      <if test="dvrID != null">
+        and dvr_ID like '%'||#{dvrID}||'%'
+      </if>
+      order by dvr_ID
+    ) x where x.rn &gt;= #{beginRow} and x.rn &lt; #{endRow}
+  </select>
+
+  <select id="count" parameterType="com.mydao.dvr.entrty.CodeVideoCamera" resultType="java.lang.Integer">
+    select count(1) from Code_video_camera t where 1 = 1
+    <if test="dvrID != null">
+      and dvr_ID like '%'||#{dvrID}||'%'
+    </if>
+  </select>
+
+  <select id="selectByDvrId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select * from code_video_camera where dvr_id = #{dvrID}
+  </select>
 </mapper>
